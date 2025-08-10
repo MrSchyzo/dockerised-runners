@@ -3,7 +3,7 @@ FROM ubuntu:24.04
 ARG RUNNER_VERSION=2.327.1
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt update -y && apt upgrade -y && useradd -m docker
+RUN apt update -y && apt upgrade -y && useradd -p "" -m -s /bin/bash docker
 RUN apt install -y --no-install-recommends \
     curl \
     jq \
@@ -14,7 +14,12 @@ RUN apt install -y --no-install-recommends \
     python3-venv \
     python3-dev \
     python3-pip \
-    libicu-dev
+    libicu-dev \
+    fakeroot \
+    sudo \
+    gnupg \
+    lsb-release \
+    software-properties-common
 
 RUN mkdir -p /home/docker/actions-runner \
     && cd /home/docker/actions-runner \
@@ -28,6 +33,8 @@ RUN chown -R docker ~docker
 COPY start.sh start.sh
 
 RUN chmod +x start.sh
+
+RUN echo "docker ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 USER docker
 
